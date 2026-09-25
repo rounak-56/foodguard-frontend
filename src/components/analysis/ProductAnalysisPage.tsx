@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ArrowLeft, MessagesSquare } from "lucide-react";
 import Link from "next/link";
 import type { ProductAnalysisResult } from "@/data/analysis-data";
@@ -28,6 +28,12 @@ import { AnalysisError } from "./AnalysisError";
 import { analysisCache, analysisCacheKey } from "@/lib/cache/analysis-cache";
 import { OfflineIndicator } from "@/components/offline/OfflineIndicator";
 import { apiUrl } from "@/lib/network/api-url";
+import {
+  createScanEventId,
+  getFoodGuardAuthHeaders,
+  publishGamificationUpdate,
+  submitProductScanActivity,
+} from "@/services/gamification.service";
 
 type AnalysisPhase = "loading" | "result" | "error";
 
@@ -39,6 +45,7 @@ type ProductAnalysisPageProps = {
   brand?: string;
   ocrText?: string;
   ocrConfidence?: number | null;
+  scanEventId?: string;
   lang?: string;
 };
 
@@ -50,6 +57,7 @@ export function ProductAnalysisPage({
   brand = "",
   ocrText = "",
   ocrConfidence = null,
+  scanEventId: scanEventIdFromQuery,
   lang = "en",
 }: ProductAnalysisPageProps) {
   const labels = getAnalysisLabels(lang);
@@ -57,6 +65,8 @@ export function ProductAnalysisPage({
   const [phase, setPhase] = useState<AnalysisPhase>("loading");
   const [product, setProduct] = useState<ProductAnalysisResult | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const scanEventIdRef = useRef<string | null>(null);
+  const scanSignatureRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (phase !== "result" || !product || !firebaseMode || !firebaseUser) return;
@@ -86,6 +96,7 @@ export function ProductAnalysisPage({
       const trimmedIngredients = ingredients.trim();
       const trimmedName = productName.trim();
       const trimmedOcrText = ocrText.trim();
+      const providedScanEventId = scanEventIdFromQuery?.trim();
       if (!trimmedBarcode && !trimmedIngredients && !trimmedName && !trimmedOcrText) {
         if (!cancelled) setPhase("error");
         return;
@@ -104,10 +115,29 @@ export function ProductAnalysisPage({
         }
       }
 
+      const scanSignature = [
+        trimmedBarcode,
+        trimmedIngredients,
+        trimmedName,
+        brand.trim(),
+        trimmedOcrText,
+        imageUrl,
+        providedScanEventId ?? "",
+      ].join("|");
+      if (scanSignatureRef.current !== scanSignature) {
+        scanSignatureRef.current = scanSignature;
+        scanEventIdRef.current = providedScanEventId || createScanEventId();
+      }
+      const scanEventId = providedScanEventId || scanEventIdRef.current || createScanEventId();
+      scanEventIdRef.current = scanEventId;
+
       try {
         const response = await fetch(apiUrl("/api/analyze"), {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...getFoodGuardAuthHeaders(),
+          },
           signal: controller.signal,
           body: JSON.stringify({
             barcode: trimmedBarcode || undefined,
@@ -118,12 +148,23 @@ export function ProductAnalysisPage({
             ocrConfidence:
               typeof ocrConfidence === "number" ? ocrConfidence : undefined,
             imageAvailable: Boolean(imageUrl || trimmedOcrText),
+            scan_event_id: providedScanEventId || undefined,
             language: lang === "hi" ? "hi" : "en",
           }),
         });
         const json = (await response.json()) as {
           success: boolean;
           data?: ProductAnalysisResult;
+           meta?: {
+             gamification?: {
+               xp_awarded: number;
+               total_xp: number;
+               current_streak: number;
+               longest_streak: number;
+               activity_date: string;
+               idempotent: boolean;
+             } | null;
+           } | null;
           error?: { message?: string } | null;
         };
         if (cancelled) return;
@@ -137,6 +178,34 @@ export function ProductAnalysisPage({
         setProduct(json.data);
         setPhase("result");
         if (cacheKey) void analysisCache().save(cacheKey, json.data);
+
+         // Only a fresh, identified analysis can submit activity. Cached
+         // results intentionally do not trigger this path.
+         const freshProduct = json.data;
+         if (providedScanEventId && freshProduct.id && freshProduct.id !== "manual") {
+           try {
+             await submitProductScanActivity(freshProduct.id, scanEventId);
+           } catch {
+             // The analysis response may already contain the authoritative
+             // reward if the separate activity request was interrupted.
+             const reward = json.meta?.gamification;
+             if (reward) {
+               publishGamificationUpdate({
+                 total_xp: reward.total_xp,
+                 current_streak: reward.current_streak,
+                 longest_streak: reward.longest_streak,
+                 last_activity_date: reward.activity_date,
+               });
+             }
+           }
+         } else if (providedScanEventId && json.meta?.gamification) {
+           publishGamificationUpdate({
+             total_xp: json.meta.gamification.total_xp,
+             current_streak: json.meta.gamification.current_streak,
+             longest_streak: json.meta.gamification.longest_streak,
+             last_activity_date: json.meta.gamification.activity_date,
+           });
+         }
       } catch (error) {
         if (cancelled) return;
         if (error instanceof DOMException && error.name === "AbortError") return;
@@ -152,7 +221,7 @@ export function ProductAnalysisPage({
       cancelled = true;
       controller.abort();
     };
-  }, [barcode, ingredients, productName, brand, ocrText, ocrConfidence, lang, attempt, imageUrl]);
+  }, [barcode, ingredients, productName, brand, ocrText, ocrConfidence, scanEventIdFromQuery, lang, attempt, imageUrl]);
 
   const handleTryAgain = useCallback(() => {
     setAttempt((a) => a + 1);

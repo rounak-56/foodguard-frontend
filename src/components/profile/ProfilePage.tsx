@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { firebaseGetProfile, firebaseSaveProfile } from "@/lib/firebase/db";
 import { firebaseUpdateDisplayName } from "@/lib/firebase/auth";
+import { useSafeBack } from "@/lib/navigation/use-safe-back";
 import { ProfileHeader } from "./ProfileHeader";
 import { PersonalInfoSection } from "./PersonalInfoSection";
 import { GoalsSection } from "./GoalsSection";
@@ -38,6 +39,7 @@ type ProfilePageProps = {
 
 export function ProfilePage({ lang = "en" }: ProfilePageProps) {
   const router = useRouter();
+  const goBack = useSafeBack("/");
   const t = getProfileLabels(lang);
   const { firebaseMode, firebaseUser, logout } = useAuth();
 
@@ -122,7 +124,7 @@ export function ProfilePage({ lang = "en" }: ProfilePageProps) {
         <div className="mx-auto flex h-14 max-w-2xl items-center gap-3 px-4">
           <button
             type="button"
-            onClick={() => router.back()}
+            onClick={goBack}
             className="flex size-9 items-center justify-center rounded-xl transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             aria-label="Go back"
           >

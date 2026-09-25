@@ -21,6 +21,7 @@ import { ScanError } from "./ScanError";
 import { ScanTips } from "./ScanTips";
 import { ProductNotFound } from "./ProductNotFound";
 import { OfflineIndicator } from "@/components/offline/OfflineIndicator";
+import { createScanEventId } from "@/services/gamification.service";
 
 const RESOLUTION_SOURCE_LABELS: Record<string, string> = {
   local_cache: "From saved data",
@@ -88,12 +89,18 @@ export function ScannerPage({ lang = "en", initialScreen = "identify" }: Scanner
       setExtracted(null);
       return;
     }
-    setScreen((s) => (s === "identify" ? "identify" : "identify"));
-  }, [resolution]);
+    if (screen !== "identify") {
+      setScreen("identify");
+      return;
+    }
+    router.push("/");
+  }, [resolution, router, screen]);
 
   const openAnalysis = useCallback(
     (product: IdentifiedProduct, extra?: ExtractedInfo | null) => {
-      router.push(buildAnalysisPath(product, extra ?? undefined));
+      router.push(
+        buildAnalysisPath(product, extra ?? undefined, undefined, createScanEventId()),
+      );
     },
     [router],
   );

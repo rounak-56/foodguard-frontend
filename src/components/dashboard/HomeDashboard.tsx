@@ -11,12 +11,11 @@ import { useAuth } from "@/components/AuthProvider";
 import { WelcomeSection } from "@/components/dashboard/WelcomeSection";
 import { ScanHeroCard } from "@/components/dashboard/ScanHeroCard";
 import { SearchCard } from "@/components/dashboard/SearchCard";
-import { ProductOverview } from "@/components/dashboard/ProductOverview";
-import { RecentScans } from "@/components/dashboard/RecentScans";
 import { PersonalizedInsight } from "@/components/dashboard/PersonalizedInsight";
 import { HowItWorks } from "@/components/dashboard/HowItWorks";
 import { TrustFooter } from "@/components/dashboard/TrustFooter";
 import { QuickActions } from "@/components/dashboard/QuickActions";
+import { GamificationCard } from "@/components/dashboard/GamificationCard";
 import {
   TopNavigation,
   BottomNavigation,
@@ -152,8 +151,6 @@ export function HomeDashboard() {
     }
   }, []);
 
-  const hasScans = recentScans.length > 0;
-
   return (
     <div className="flex min-h-screen flex-col bg-background pb-20 lg:pb-0">
       <TopNavigation
@@ -182,26 +179,12 @@ export function HomeDashboard() {
               labels={labels.search}
               onClick={() => router.push("/search")}
             />
-            <QuickActions />
             <ScanHeroCard
               labels={labels.scan}
-              onScan={() => router.push("/scan?open=camera&mode=barcode")}
+              onScan={() => router.push("/scan")}
             />
-
-            <section className="grid gap-4 lg:grid-cols-[1fr_320px]">
-              <ProductOverview
-                labels={labels.summary}
-                summary={concernSummary}
-                onViewHistory={() => router.push("/history")}
-              />
-              <RecentScans
-                labels={labels.recentScans}
-                scans={recentScans}
-                onViewAll={() => router.push("/history")}
-                onScan={() => router.push("/scan?open=camera&mode=barcode")}
-                hasScans={hasScans}
-              />
-            </section>
+            <GamificationCard />
+            <QuickActions />
 
             <section>
               <PersonalizedInsight

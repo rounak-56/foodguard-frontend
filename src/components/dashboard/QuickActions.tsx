@@ -1,42 +1,7 @@
 "use client";
 
-import { Camera, QrCode, Search, Clock, MessagesSquare, ShieldAlert } from "lucide-react";
+import { MessagesSquare, ShieldAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
-
-const actions = [
-  {
-    id: "label",
-    title: "Scan label",
-    subtitle: "Photo OCR",
-    icon: Camera,
-    color: "from-orange-500 to-red-500",
-    href: "/scan?open=camera&mode=manual",
-  },
-  {
-    id: "barcode",
-    title: "Scan barcode",
-    subtitle: "Quick lookup",
-    icon: QrCode,
-    color: "from-blue-500 to-indigo-500",
-    href: "/scan?open=camera&mode=barcode",
-  },
-  {
-    id: "search",
-    title: "Search",
-    subtitle: "Name or ingredient",
-    icon: Search,
-    color: "from-green-500 to-teal-500",
-    href: "/search",
-  },
-  {
-    id: "history",
-    title: "History",
-    subtitle: "Past scans",
-    icon: Clock,
-    color: "from-purple-500 to-pink-500",
-    href: "/history",
-  },
-];
 
 const extra = [
   {
@@ -61,26 +26,7 @@ export function QuickActions() {
   const router = useRouter();
 
   return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-2 gap-3">
-        {actions.map((action) => (
-          <button
-            key={action.id}
-            type="button"
-            onClick={() => router.push(action.href)}
-            className="rounded-xl bg-card p-4 text-left shadow-sm transition-shadow hover:shadow-md"
-          >
-            <div
-              className={`mb-3 flex size-12 items-center justify-center rounded-full bg-gradient-to-r text-white ${action.color}`}
-            >
-              <action.icon className="size-6" aria-hidden="true" />
-            </div>
-            <h3 className="text-sm font-medium text-foreground">{action.title}</h3>
-            <p className="text-xs text-muted-foreground">{action.subtitle}</p>
-          </button>
-        ))}
-      </div>
-      <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-3">
         {extra.map((item) => (
           <button
             key={item.id}
@@ -93,7 +39,6 @@ export function QuickActions() {
             <p className="text-xs text-muted-foreground">{item.subtitle}</p>
           </button>
         ))}
-      </div>
     </div>
   );
 }
