@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { ArrowLeft, MessagesSquare } from "lucide-react";
+import { ArrowLeft, MessagesSquare, Flame, Sparkles, X } from "lucide-react";
 import Link from "next/link";
 import type { ProductAnalysisResult } from "@/data/analysis-data";
 import { getAnalysisLabels } from "@/data/analysis-labels";
@@ -33,6 +33,7 @@ import {
   getFoodGuardAuthHeaders,
   publishGamificationUpdate,
   submitProductScanActivity,
+  type GamificationActivityResult,
 } from "@/services/gamification.service";
 
 type AnalysisPhase = "loading" | "result" | "error";
@@ -65,6 +66,7 @@ export function ProductAnalysisPage({
   const [phase, setPhase] = useState<AnalysisPhase>("loading");
   const [product, setProduct] = useState<ProductAnalysisResult | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const [reward, setReward] = useState<GamificationActivityResult | null>(null);
   const scanEventIdRef = useRef<string | null>(null);
   const scanSignatureRef = useRef<string | null>(null);
 
@@ -91,6 +93,7 @@ export function ProductAnalysisPage({
 
     async function load() {
       setPhase("loading");
+       setReward(null);
       setProduct(null);
       const trimmedBarcode = barcode.trim();
       const trimmedIngredients = ingredients.trim();
@@ -179,12 +182,25 @@ export function ProductAnalysisPage({
         setPhase("result");
         if (cacheKey) void analysisCache().save(cacheKey, json.data);
 
+         const analysisReward = json.meta?.gamification;
+         if (analysisReward && !analysisReward.idempotent) {
+           setReward({
+             xp_awarded: analysisReward.xp_awarded,
+             total_xp: analysisReward.total_xp,
+             current_streak: analysisReward.current_streak,
+             longest_streak: analysisReward.longest_streak,
+             activity_date: analysisReward.activity_date,
+             idempotent: analysisReward.idempotent,
+           });
+         }
+
          // Only a fresh, identified analysis can submit activity. Cached
          // results intentionally do not trigger this path.
          const freshProduct = json.data;
          if (providedScanEventId && freshProduct.id && freshProduct.id !== "manual") {
            try {
-             await submitProductScanActivity(freshProduct.id, scanEventId);
+             const activity = await submitProductScanActivity(freshProduct.id, scanEventId);
+              if (!activity.idempotent) setReward(activity);
            } catch {
              // The analysis response may already contain the authoritative
              // reward if the separate activity request was interrupted.
@@ -196,6 +212,16 @@ export function ProductAnalysisPage({
                  longest_streak: reward.longest_streak,
                  last_activity_date: reward.activity_date,
                });
+               if (!reward.idempotent) {
+                 setReward({
+                   xp_awarded: reward.xp_awarded,
+                   total_xp: reward.total_xp,
+                   current_streak: reward.current_streak,
+                   longest_streak: reward.longest_streak,
+                   activity_date: reward.activity_date,
+                   idempotent: reward.idempotent,
+                 });
+               }
              }
            }
          } else if (providedScanEventId && json.meta?.gamification) {
@@ -241,7 +267,7 @@ export function ProductAnalysisPage({
             </Link>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-12">
+        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6 lg:py-16">
           <AnalysisLoading
             title={labels.loading.title}
             description={labels.loading.description}
@@ -266,7 +292,7 @@ export function ProductAnalysisPage({
             </Link>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-12">
+        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6 lg:py-16">
           <AnalysisError
             title={labels.error.title}
             description={labels.error.description}
@@ -306,7 +332,7 @@ export function ProductAnalysisPage({
         </div>
       </header>
 
-      <main className="mx-auto w-full flex-1 px-4 py-6">
+      <main className="mx-auto w-full flex-1 px-4 py-6 sm:px-6 lg:py-10">
         <div className="mx-auto max-w-5xl">
           <div className="mb-4 flex justify-end">
             <OfflineIndicator />
@@ -466,6 +492,60 @@ export function ProductAnalysisPage({
           </div>
         </div>
       </main>
+
+      {reward && !reward.idempotent && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-sidebar/45 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="foodguard-reward-title"
+        >
+          <div className="foodguard-card relative w-full max-w-sm bg-card p-7 text-center shadow-xl">
+            <button
+              type="button"
+              onClick={() => setReward(null)}
+              className="absolute right-4 top-4 flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              aria-label="Close reward"
+            >
+              <X className="size-4" aria-hidden="true" />
+            </button>
+            <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-primary-light text-primary">
+              <Sparkles className="size-7" aria-hidden="true" />
+            </div>
+            <p className="mt-5 text-3xl font-semibold tracking-tight text-primary">
+              +{reward.xp_awarded} XP
+            </p>
+            <h2 id="foodguard-reward-title" className="mt-2 text-lg font-semibold text-foreground">
+              Great! Product scanned.
+            </h2>
+            <div className="mt-6 grid grid-cols-2 gap-3 text-left">
+              <div className="rounded-xl bg-primary-light/60 p-3">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Flame className="size-3.5 text-primary" aria-hidden="true" />
+                  Streak updated
+                </div>
+                <p className="mt-1 text-sm font-semibold text-foreground">
+                  {reward.current_streak} {reward.current_streak === 1 ? "day" : "days"}
+                </p>
+              </div>
+              <div className="rounded-xl bg-secondary p-3">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Sparkles className="size-3.5 text-primary" aria-hidden="true" />
+                  Total XP
+                </div>
+                <p className="mt-1 text-sm font-semibold text-foreground">{reward.total_xp} XP</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setReward(null)}
+              className="mt-6 w-full rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

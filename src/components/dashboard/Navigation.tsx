@@ -54,7 +54,7 @@ export function TopNavigation({
 
   return (
     <nav
-      className="hidden border-b border-border bg-card/90 backdrop-blur-md lg:block"
+      className="border-b border-border bg-card/90 backdrop-blur-md lg:hidden"
       aria-label="Main navigation"
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
@@ -65,7 +65,7 @@ export function TopNavigation({
           </span>
         </Link>
 
-        <div className="flex items-center gap-1">
+        <div className="hidden items-center gap-1 md:flex">
           {items.map(({ key, label, href, Icon }) => {
             const isActive = key === activeKey;
             return (
@@ -76,7 +76,7 @@ export function TopNavigation({
                   "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                   isActive
-                    ? "bg-gradient-to-r from-orange-500/15 to-red-500/15 text-orange-600 dark:text-orange-400"
+                    ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
                 aria-current={isActive ? "page" : undefined}
@@ -119,7 +119,7 @@ export function TopNavigation({
                       "flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm transition-colors",
                       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                       currentLanguage === lang.id
-                        ? "bg-orange-50 text-orange-600 font-medium dark:bg-orange-950/40 dark:text-orange-400"
+                        ? "bg-primary-light text-primary-dark font-medium"
                         : "text-foreground hover:bg-muted",
                     )}
                   >
@@ -138,7 +138,7 @@ export function TopNavigation({
                 setProfileOpen((p) => !p);
                 setLangOpen(false);
               }}
-              className="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-red-500 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               aria-label="Profile menu"
             >
               <User className="size-4" aria-hidden="true" />
@@ -196,7 +196,7 @@ export function BottomNavigation({
                 "flex flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 transition-colors",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 isActive
-                  ? "text-orange-600 dark:text-orange-400"
+                  ? "text-primary"
                   : "text-muted-foreground hover:text-foreground",
               )}
               aria-current={isActive ? "page" : undefined}

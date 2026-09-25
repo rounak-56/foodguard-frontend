@@ -10,7 +10,7 @@ export function BrandMark({
   return (
     <div
       className={cn(
-        "flex items-center justify-center rounded-full bg-gradient-to-br from-orange-400 to-red-500 text-white shadow-sm",
+        "flex items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm",
         className ?? "size-8",
       )}
       aria-hidden="true"

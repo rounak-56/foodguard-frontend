@@ -137,7 +137,7 @@ export function ChatPage({
         productName={productName}
         brand={brand}
       />
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-3">
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 py-5 sm:px-6 lg:py-8">
         <div
           ref={listRef}
           className="flex flex-1 flex-col gap-3 overflow-y-auto py-4"

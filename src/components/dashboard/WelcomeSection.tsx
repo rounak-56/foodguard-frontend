@@ -1,6 +1,6 @@
 "use client";
 
-import { User, Settings, Shield } from "lucide-react";
+import { Settings, ShieldCheck, ArrowUpRight } from "lucide-react";
 import type { DashboardLabels } from "@/data/dashboard-labels";
 import { BrandMark } from "@/components/ui/BrandMark";
 
@@ -28,83 +28,83 @@ export function WelcomeSection({
     hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
   return (
-    <div className="bg-gradient-to-r from-orange-500 to-red-500 p-4 text-white sm:rounded-2xl sm:p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <BrandMark className="size-11 shadow-md" iconClassName="size-5" />
-          <div>
-            <h1 className="text-xl font-medium">
-              {greeting}, {userName}!
-            </h1>
-            <p className="text-sm text-orange-100">{labels.subtitle}</p>
+    <section className="foodguard-card overflow-hidden bg-primary-light/55">
+      <div className="grid gap-6 p-6 sm:p-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-center lg:p-10">
+        <div>
+          <div className="flex items-center gap-3">
+            <BrandMark className="size-11 shadow-sm" iconClassName="size-5" />
+            <span className="foodguard-eyebrow text-primary-dark">FoodGuard dashboard</span>
           </div>
-        </div>
-        <div className="flex gap-1">
-          {onProfile && (
+          <h1 className="mt-6 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+            {greeting}, {userName}.
+          </h1>
+          <p className="mt-2 max-w-xl text-base leading-7 text-muted-foreground">
+            {labels.subtitle}
+          </p>
+          <div className="mt-6 flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={onProfile}
-              className="flex size-9 items-center justify-center rounded-lg text-white hover:bg-white/20"
-              aria-label="Profile"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
-              <User className="size-5" />
+              View my profile
+              <ArrowUpRight className="size-4" aria-hidden="true" />
             </button>
-          )}
-          {onSettings && (
-            <button
-              type="button"
-              onClick={onSettings}
-              className="flex size-9 items-center justify-center rounded-lg text-white hover:bg-white/20"
-              aria-label="Settings"
-            >
-              <Settings className="size-5" />
-            </button>
-          )}
-        </div>
-      </div>
-
-      <div className="mb-4 rounded-lg bg-white/20 p-3">
-        <div className="mb-2 flex items-center gap-2">
-          <Shield className="size-4" />
-          <span className="text-sm">Health profile</span>
-        </div>
-        <div className="flex flex-wrap gap-1">
-          {allergies.length === 0 ? (
-            <span className="rounded-full bg-white/30 px-2 py-0.5 text-xs">
-              No allergies listed
-            </span>
-          ) : (
-            allergies.slice(0, 4).map((allergy) => (
-              <span
-                key={allergy}
-                className="rounded-full border border-white/50 bg-white/30 px-2 py-0.5 text-xs"
+            {onSettings && (
+              <button
+                type="button"
+                onClick={onSettings}
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-white px-4 py-2.5 text-sm font-semibold text-primary-dark transition-colors hover:border-primary/30 hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
-                {allergy}
-              </span>
-            ))
-          )}
-          {allergies.length > 4 && (
-            <span className="rounded-full border border-white/50 bg-white/30 px-2 py-0.5 text-xs">
-              +{allergies.length - 4} more
-            </span>
-          )}
+                <Settings className="size-4" aria-hidden="true" />
+                Settings
+              </button>
+            )}
+          </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-3 gap-2 text-center text-xs">
-        <div className="rounded-lg bg-white/20 p-2">
-          <p className="text-base font-bold">{scanCount}</p>
-          <p className="text-orange-100">Recent scans</p>
-        </div>
-        <div className="rounded-lg bg-white/20 p-2">
-          <p className="text-base font-bold">{healthyCount}</p>
-          <p className="text-orange-100">Lower concern</p>
-        </div>
-        <div className="rounded-lg bg-white/20 p-2">
-          <p className="text-base font-bold">{allergies.length}</p>
-          <p className="text-orange-100">Allergens</p>
+        <div className="rounded-2xl border border-primary/15 bg-white/80 p-5 shadow-sm backdrop-blur-sm">
+          <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <ShieldCheck className="size-4 text-primary" aria-hidden="true" />
+            Your food safety profile
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {allergies.length === 0 ? (
+              <span className="rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground">
+                No allergies listed
+              </span>
+            ) : (
+              allergies.slice(0, 4).map((allergy) => (
+                <span
+                  key={allergy}
+                  className="rounded-full border border-primary/20 bg-primary-light px-3 py-1.5 text-xs font-medium text-primary-dark"
+                >
+                  {allergy}
+                </span>
+              ))
+            )}
+            {allergies.length > 4 && (
+              <span className="rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground">
+                +{allergies.length - 4} more
+              </span>
+            )}
+          </div>
+          <div className="mt-5 grid grid-cols-3 gap-2 border-t border-primary/10 pt-4 text-center">
+            <div>
+              <p className="text-lg font-semibold text-foreground">{scanCount}</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">Recent scans</p>
+            </div>
+            <div>
+              <p className="text-lg font-semibold text-foreground">{healthyCount}</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">Lower concern</p>
+            </div>
+            <div>
+              <p className="text-lg font-semibold text-foreground">{allergies.length}</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">Allergens</p>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

@@ -8,36 +8,36 @@ type HowItWorksProps = {
 };
 
 const stepColors = [
-  "bg-gradient-to-br from-orange-500 to-red-500",
-  "bg-gradient-to-br from-blue-500 to-indigo-500",
-  "bg-gradient-to-br from-green-500 to-teal-500",
-  "bg-gradient-to-br from-purple-500 to-pink-500",
+  "bg-primary",
+  "bg-primary/80",
+  "bg-primary/60",
+  "bg-primary/45",
 ];
 const stepIcons = [ScanLine, Cpu, Lightbulb, GitCompare];
 
 export function HowItWorks({ labels }: HowItWorksProps) {
   return (
-    <div className="rounded-xl bg-card p-4 shadow-sm sm:p-5">
-      <h2 className="mb-5 text-base font-medium text-foreground">{labels.title}</h2>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+    <section className="foodguard-card p-5 sm:p-6">
+      <h2 className="text-lg font-semibold tracking-tight text-foreground">{labels.title}</h2>
+      <div className="mt-6 grid grid-cols-2 gap-5 sm:grid-cols-4">
         {labels.steps.map((step, i) => {
           const Icon = stepIcons[i] ?? ScanLine;
           return (
             <div key={step.number} className="flex flex-col items-center text-center">
               <div
-                className={`mb-3 flex size-12 items-center justify-center rounded-full text-white ${stepColors[i] ?? stepColors[0]}`}
+                className={`mb-3 flex size-12 items-center justify-center rounded-2xl text-white ${stepColors[i] ?? stepColors[0]}`}
               >
                 <Icon className="size-5" aria-hidden="true" />
               </div>
-              <span className="text-xs font-bold text-orange-500/70">{step.number}</span>
-              <p className="mt-1 text-sm font-medium text-foreground">{step.label}</p>
-              <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+              <span className="text-[10px] font-bold tracking-[0.14em] text-primary">{step.number}</span>
+              <p className="mt-1 text-sm font-semibold text-foreground">{step.label}</p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                 {step.description}
               </p>
             </div>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }

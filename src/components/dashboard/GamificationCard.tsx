@@ -48,7 +48,7 @@ export function GamificationCard() {
 
   if (state === "guest") {
     return (
-      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+      <section className="foodguard-card p-5">
         <p className="text-sm font-medium text-foreground">
           Sign in to track your FoodGuard progress.
         </p>
@@ -65,7 +65,7 @@ export function GamificationCard() {
 
   if (state === "loading") {
     return (
-      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm" aria-live="polite">
+      <section className="foodguard-card p-5" aria-live="polite">
         <div className="flex items-center gap-3 text-sm text-muted-foreground">
           <RefreshCw className="size-4 animate-spin" aria-hidden="true" />
           Loading your FoodGuard progress...
@@ -76,7 +76,7 @@ export function GamificationCard() {
 
   if (state === "error" || !profile) {
     return (
-      <section className="rounded-2xl border border-red-200 bg-red-50/60 p-5 dark:border-red-900/60 dark:bg-red-950/30" aria-live="polite">
+      <section className="foodguard-card border-red-200 bg-red-50/60 p-5" aria-live="polite">
         <p className="text-sm font-medium text-red-800 dark:text-red-200">
           Unable to load your progress.
         </p>
@@ -92,14 +92,41 @@ export function GamificationCard() {
     );
   }
 
+  if (
+    profile.total_xp === 0 &&
+    profile.current_streak === 0 &&
+    profile.longest_streak === 0
+  ) {
+    return (
+      <section className="foodguard-card h-full border-primary/20 bg-primary-light/45 p-5 sm:p-6">
+        <p className="foodguard-eyebrow text-primary-dark">FoodGuard progress</p>
+        <h2 className="mt-2 text-lg font-semibold text-foreground">No scans yet</h2>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          Scan your first food product to start your FoodGuard journey.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2 text-xs font-medium text-muted-foreground">
+          <span className="rounded-full bg-white/80 px-3 py-1.5">0 XP</span>
+          <span className="rounded-full bg-white/80 px-3 py-1.5">0 day streak</span>
+        </div>
+        <button
+          type="button"
+          onClick={() => router.push("/scan")}
+          className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-3.5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        >
+          Scan your first product
+        </button>
+      </section>
+    );
+  }
+
   return (
-    <section className="rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 via-background to-amber-50 p-5 shadow-sm dark:border-orange-900/60 dark:from-orange-950/40 dark:via-background dark:to-amber-950/20">
+    <section className="foodguard-card h-full border-primary/20 bg-primary-light/45 p-5 sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-medium text-muted-foreground">FoodGuard progress</p>
+          <p className="foodguard-eyebrow text-primary-dark">FoodGuard progress</p>
           <h2 className="mt-1 text-xl font-semibold text-foreground">Your daily streak</h2>
         </div>
-        <div className="rounded-xl bg-orange-100 p-2.5 text-orange-600 dark:bg-orange-950/70 dark:text-orange-300">
+        <div className="rounded-xl bg-primary/10 p-2.5 text-primary">
           <Flame className="size-6" aria-hidden="true" />
         </div>
       </div>

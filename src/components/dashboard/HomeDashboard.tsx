@@ -2,11 +2,11 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Home, Search, Clock, User, Database } from "lucide-react";
+import { Home, Search, Clock, User, ScanLine } from "lucide-react";
 
 import { DEFAULT_LANGUAGE_ID } from "@/data/languages";
 import { getDashboardLabels } from "@/data/dashboard-labels";
-import type { ScannedProduct } from "@/data/mock-data";
+import type { ScannedProduct } from "@/types/dashboard";
 import { useAuth } from "@/components/AuthProvider";
 import { WelcomeSection } from "@/components/dashboard/WelcomeSection";
 import { ScanHeroCard } from "@/components/dashboard/ScanHeroCard";
@@ -35,8 +35,8 @@ function getInitialLang(): string {
 const NAV_ITEMS = [
   { key: "home", label: "Home", href: "/", Icon: Home },
   { key: "search", label: "Search", href: "/search", Icon: Search },
+  { key: "scan", label: "Scan", href: "/scan", Icon: ScanLine },
   { key: "history", label: "History", href: "/history", Icon: Clock },
-  { key: "data", label: "Data", href: "/data", Icon: Database },
   { key: "profile", label: "Profile", href: "/profile", Icon: User },
 ];
 
@@ -160,7 +160,7 @@ export function HomeDashboard() {
         onLanguageChange={handleLanguageChange}
       />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 lg:px-8 lg:py-8">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-5 sm:px-6 lg:px-10 lg:py-10">
         <div className="flex flex-col gap-4 lg:gap-6">
           <section className="lg:rounded-2xl lg:overflow-hidden">
             <WelcomeSection
@@ -174,16 +174,18 @@ export function HomeDashboard() {
             />
           </section>
 
-          <div className="flex flex-col gap-4 px-4 sm:px-6 lg:px-0">
+          <div className="flex flex-col gap-6">
             <SearchCard
               labels={labels.search}
               onClick={() => router.push("/search")}
             />
-            <ScanHeroCard
-              labels={labels.scan}
-              onScan={() => router.push("/scan")}
-            />
-            <GamificationCard />
+            <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+              <ScanHeroCard
+                labels={labels.scan}
+                onScan={() => router.push("/scan")}
+              />
+              <GamificationCard />
+            </div>
             <QuickActions />
 
             <section>

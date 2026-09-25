@@ -2,7 +2,7 @@
 
 import { ChevronRight, History, Clock } from "lucide-react";
 import type { DashboardLabels } from "@/data/dashboard-labels";
-import type { ScannedProduct } from "@/data/mock-data";
+import type { ScannedProduct } from "@/types/dashboard";
 import { CATEGORY_LABELS, CONCERN_COLORS } from "@/data/mock-data";
 
 type RecentScansProps = {

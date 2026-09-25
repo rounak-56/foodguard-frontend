@@ -1,6 +1,6 @@
 "use client";
 
-import { ScanBarcode, Search, Camera } from "lucide-react";
+import { ScanBarcode, Search, Camera, ArrowUpRight } from "lucide-react";
 
 export type IdentifyMethod = "barcode" | "search" | "manual";
 
@@ -15,6 +15,30 @@ type IdentifyLandingProps = {
   onSelect: (method: IdentifyMethod) => void;
 };
 
+const methods = [
+  {
+    id: "barcode" as const,
+    titleKey: "scanBarcode" as const,
+    descriptionKey: "scanBarcodeDesc" as const,
+    Icon: ScanBarcode,
+    accent: "bg-primary-light text-primary-dark",
+  },
+  {
+    id: "search" as const,
+    titleKey: "searchName" as const,
+    descriptionKey: "searchNameDesc" as const,
+    Icon: Search,
+    accent: "bg-secondary text-primary",
+  },
+  {
+    id: "manual" as const,
+    titleKey: "addManually" as const,
+    descriptionKey: "addManuallyDesc" as const,
+    Icon: Camera,
+    accent: "bg-primary/10 text-primary",
+  },
+];
+
 export function IdentifyLanding({
   subtitle,
   scanBarcode,
@@ -25,51 +49,42 @@ export function IdentifyLanding({
   addManuallyDesc,
   onSelect,
 }: IdentifyLandingProps) {
+  const labels = {
+    scanBarcode,
+    scanBarcodeDesc,
+    searchName,
+    searchNameDesc,
+    addManually,
+    addManuallyDesc,
+  };
+
   return (
-    <div className="flex flex-col gap-5">
-      <p className="mb-1 text-center text-sm text-muted-foreground">{subtitle}</p>
+    <section>
+      <div className="mb-7 text-center">
+        <p className="foodguard-eyebrow text-primary">Identify a product</p>
+        <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">{subtitle}</p>
+      </div>
 
-      <button
-        type="button"
-        onClick={() => onSelect("barcode")}
-        className="group flex items-center gap-4 rounded-2xl border border-border bg-card p-5 text-left shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
-      >
-        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-          <ScanBarcode className="size-6 text-primary" aria-hidden="true" />
-        </div>
-        <div>
-          <h3 className="text-base font-semibold text-foreground">{scanBarcode}</h3>
-          <p className="mt-0.5 text-sm text-muted-foreground">{scanBarcodeDesc}</p>
-        </div>
-      </button>
-
-      <button
-        type="button"
-        onClick={() => onSelect("search")}
-        className="group flex items-center gap-4 rounded-2xl border border-border bg-card p-5 text-left shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
-      >
-        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-          <Search className="size-6 text-primary" aria-hidden="true" />
-        </div>
-        <div>
-          <h3 className="text-base font-semibold text-foreground">{searchName}</h3>
-          <p className="mt-0.5 text-sm text-muted-foreground">{searchNameDesc}</p>
-        </div>
-      </button>
-
-      <button
-        type="button"
-        onClick={() => onSelect("manual")}
-        className="group flex items-center gap-4 rounded-2xl border border-border bg-card p-5 text-left shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
-      >
-        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-          <Camera className="size-6 text-primary" aria-hidden="true" />
-        </div>
-        <div>
-          <h3 className="text-base font-semibold text-foreground">{addManually}</h3>
-          <p className="mt-0.5 text-sm text-muted-foreground">{addManuallyDesc}</p>
-        </div>
-      </button>
-    </div>
+      <div className="grid gap-4 sm:grid-cols-3">
+        {methods.map(({ id, titleKey, descriptionKey, Icon, accent }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => onSelect(id)}
+            className="group foodguard-card flex min-h-48 flex-col items-start p-5 text-left transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          >
+            <div className={`flex size-12 items-center justify-center rounded-2xl ${accent}`}>
+              <Icon className="size-6" aria-hidden="true" />
+            </div>
+            <h3 className="mt-5 text-base font-semibold text-foreground">{labels[titleKey]}</h3>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">{labels[descriptionKey]}</p>
+            <span className="mt-auto inline-flex items-center gap-1 pt-5 text-xs font-semibold text-primary">
+              Continue
+              <ArrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
+            </span>
+          </button>
+        ))}
+      </div>
+    </section>
   );
 }

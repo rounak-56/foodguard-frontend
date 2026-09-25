@@ -51,7 +51,7 @@ function IngredientCard({
   const style = ASSESSMENT_STYLES[ingredient.assessment];
 
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden">
+    <div className="foodguard-card overflow-hidden rounded-xl">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}

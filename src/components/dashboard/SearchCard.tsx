@@ -15,7 +15,7 @@ export function SearchCard({ labels, onClick }: SearchCardProps) {
       <button
         type="button"
         onClick={onClick}
-        className="flex h-12 w-full items-center rounded-xl border border-border bg-card pl-10 pr-4 text-left text-sm text-muted-foreground shadow-sm transition-colors hover:border-orange-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="flex h-12 w-full items-center rounded-xl border border-border bg-card pl-10 pr-4 text-left text-sm text-muted-foreground shadow-sm transition-colors hover:border-primary/40 hover:bg-primary-light/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       >
         {labels.placeholder}
       </button>

@@ -16,17 +16,17 @@ const COMPONENT_LABELS: Record<string, { label: string; icon: string }> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  available: "text-green-600 dark:text-green-400",
-  derived: "text-blue-600 dark:text-blue-400",
-  insufficient: "text-amber-600 dark:text-amber-400",
+  available: "text-[#16a36a]",
+  derived: "text-[#176b4c]",
+  insufficient: "text-[#e5a11a]",
 };
 
 function getScoreBarColor(score: number): string {
-  if (score >= 4) return "bg-green-500";
-  if (score >= 3) return "bg-emerald-400";
-  if (score >= 2) return "bg-amber-400";
-  if (score >= 1) return "bg-orange-400";
-  return "bg-red-400";
+  if (score >= 4) return "bg-[#16a36a]";
+  if (score >= 3) return "bg-[#4bbd8b]";
+  if (score >= 2) return "bg-[#e5a11a]";
+  if (score >= 1) return "bg-[#e86a3a]";
+  return "bg-[#d94a4a]";
 }
 
 export function FoodGuardScoreCard({ foodguardScore, confidenceLabel }: FoodGuardScoreCardProps) {
@@ -34,15 +34,15 @@ export function FoodGuardScoreCard({ foodguardScore, confidenceLabel }: FoodGuar
 
   const overallColor =
     final_score >= 4
-      ? "text-green-600 dark:text-green-400"
+      ? "text-[#16a36a]"
       : final_score >= 3
-        ? "text-emerald-500 dark:text-emerald-400"
+        ? "text-[#4bbd8b]"
         : final_score >= 2
-          ? "text-amber-600 dark:text-amber-400"
-          : "text-red-600 dark:text-red-400";
+          ? "text-[#e5a11a]"
+          : "text-[#d94a4a]";
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+    <div className="foodguard-card p-6">
       {/* Header */}
       <div className="mb-4 flex items-center gap-2">
         <h3 className="text-base font-semibold text-foreground">FoodGuard Health Score</h3>

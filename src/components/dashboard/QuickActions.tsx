@@ -9,7 +9,7 @@ const extra = [
     title: "Ask FoodGuard",
     subtitle: "AI chat",
     icon: MessagesSquare,
-    iconClass: "text-indigo-600",
+    iconClass: "text-primary",
     href: "/assistant",
   },
   {
@@ -17,7 +17,7 @@ const extra = [
     title: "Report issue",
     subtitle: "Food safety",
     icon: ShieldAlert,
-    iconClass: "text-orange-600",
+    iconClass: "text-amber-600",
     href: "/food-safety-assistant",
   },
 ];
