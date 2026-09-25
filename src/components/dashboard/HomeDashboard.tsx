@@ -16,6 +16,7 @@ import { RecentScans } from "@/components/dashboard/RecentScans";
 import { PersonalizedInsight } from "@/components/dashboard/PersonalizedInsight";
 import { HowItWorks } from "@/components/dashboard/HowItWorks";
 import { TrustFooter } from "@/components/dashboard/TrustFooter";
+import { QuickActions } from "@/components/dashboard/QuickActions";
 import {
   TopNavigation,
   BottomNavigation,
@@ -75,6 +76,7 @@ export function HomeDashboard() {
   const labels = getDashboardLabels(lang);
 
   const [userName, setUserName] = useState("Guest");
+  const [allergies, setAllergies] = useState<string[]>([]);
   const [recentScans, setRecentScans] = useState<ScannedProduct[]>([]);
   const [concernSummary, setConcernSummary] = useState({ high: 0, moderate: 0, low: 0 });
   const [preferences, setPreferences] = useState<{ goal: string; focuses: string[] }>({ goal: "", focuses: [] });
@@ -96,6 +98,7 @@ export function HomeDashboard() {
             const prefs = mePayload.data.preferences;
             if (prefs) {
               const goals = prefs.healthGoals ?? [];
+              setAllergies(prefs.allergies ?? []);
               setPreferences({
                 goal: goals[0] ? goals[0].replace(/_/g, " ") : "",
                 focuses: [
@@ -160,34 +163,37 @@ export function HomeDashboard() {
         onLanguageChange={handleLanguageChange}
       />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-        <div className="flex flex-col gap-6">
-          {/* Welcome + Scan Hero — full width */}
-          <section className="flex flex-col gap-5">
+      <main className="mx-auto w-full max-w-6xl flex-1 lg:px-8 lg:py-8">
+        <div className="flex flex-col gap-4 lg:gap-6">
+          <section className="lg:rounded-2xl lg:overflow-hidden">
             <WelcomeSection
               labels={labels.greeting}
               userName={userName}
+              allergies={allergies}
+              scanCount={recentScans.length}
+              healthyCount={concernSummary.low}
+              onProfile={() => router.push("/profile")}
+              onSettings={() => router.push("/profile")}
             />
+          </section>
+
+          <div className="flex flex-col gap-4 px-4 sm:px-6 lg:px-0">
+            <SearchCard
+              labels={labels.search}
+              onClick={() => router.push("/search")}
+            />
+            <QuickActions />
             <ScanHeroCard
               labels={labels.scan}
               onScan={() => router.push("/scan?open=camera&mode=barcode")}
             />
-          </section>
 
-          {/* Search + Product Overview — two columns */}
-          <section className="grid gap-5 lg:grid-cols-[1fr_320px]">
-            <div className="flex flex-col gap-5">
-              <SearchCard
-                labels={labels.search}
-                onClick={() => router.push("/search")}
-              />
+            <section className="grid gap-4 lg:grid-cols-[1fr_320px]">
               <ProductOverview
                 labels={labels.summary}
                 summary={concernSummary}
                 onViewHistory={() => router.push("/history")}
               />
-            </div>
-            <div className="flex flex-col gap-5">
               <RecentScans
                 labels={labels.recentScans}
                 scans={recentScans}
@@ -195,27 +201,24 @@ export function HomeDashboard() {
                 onScan={() => router.push("/scan?open=camera&mode=barcode")}
                 hasScans={hasScans}
               />
-            </div>
-          </section>
+            </section>
 
-          {/* Personalized Insight — full width */}
-          <section>
-            <PersonalizedInsight
-              labels={labels.personalized}
-              preferences={preferences}
-              onEdit={() => router.push("/profile")}
-            />
-          </section>
+            <section>
+              <PersonalizedInsight
+                labels={labels.personalized}
+                preferences={preferences}
+                onEdit={() => router.push("/profile")}
+              />
+            </section>
 
-          {/* How It Works — full width */}
-          <section>
-            <HowItWorks labels={labels.howItWorks} />
-          </section>
+            <section>
+              <HowItWorks labels={labels.howItWorks} />
+            </section>
 
-          {/* Trust Footer */}
-          <section>
-            <TrustFooter message={labels.trust.message} />
-          </section>
+            <section className="pb-4">
+              <TrustFooter message={labels.trust.message} />
+            </section>
+          </div>
         </div>
       </main>
 

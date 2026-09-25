@@ -1,6 +1,6 @@
 "use client";
 
-import { ScanLine } from "lucide-react";
+import { Camera } from "lucide-react";
 import type { DashboardLabels } from "@/data/dashboard-labels";
 
 type ScanHeroCardProps = {
@@ -10,32 +10,18 @@ type ScanHeroCardProps = {
 
 export function ScanHeroCard({ labels, onScan }: ScanHeroCardProps) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
-      <div className="flex flex-col items-center text-center sm:flex-row sm:items-center sm:text-left">
-        <div className="mb-4 sm:mb-0 sm:mr-6">
-          <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-primary/10 sm:mx-0">
-            <ScanLine className="size-7 text-primary" aria-hidden="true" />
-          </div>
-        </div>
-        <div className="min-w-0 flex-1">
-          <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
-            {labels.title}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {labels.subtitle}
-          </p>
-        </div>
-        <div className="mt-5 sm:mt-0 sm:ml-6">
-          <button
-            type="button"
-            onClick={onScan}
-            className="inline-flex h-12 items-center gap-2.5 rounded-xl bg-primary px-7 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 active:bg-primary/95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          >
-            <ScanLine className="size-4.5" aria-hidden="true" />
-            {labels.scanButton}
-          </button>
-        </div>
-      </div>
+    <div className="rounded-xl border-2 border-dashed border-orange-300 bg-gradient-to-br from-orange-50 to-red-50 p-5 dark:border-orange-800 dark:from-orange-950 dark:to-red-950 sm:p-6">
+      <button
+        type="button"
+        onClick={onScan}
+        className="flex h-16 w-full items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-lg font-medium text-white shadow-md transition-all hover:from-orange-600 hover:to-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2"
+      >
+        <Camera className="size-8" aria-hidden="true" />
+        {labels.scanButton}
+      </button>
+      <p className="mt-3 text-center text-sm text-muted-foreground">
+        {labels.subtitle}
+      </p>
     </div>
   );
 }

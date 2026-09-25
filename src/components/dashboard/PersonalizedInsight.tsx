@@ -16,18 +16,20 @@ export function PersonalizedInsight({
   onEdit,
 }: PersonalizedInsightProps) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+    <div className="rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-4 dark:border-blue-900 dark:from-blue-950 dark:to-indigo-950 sm:p-5">
       <div className="mb-4 flex items-center gap-3">
-        <div className="flex size-9 items-center justify-center rounded-xl bg-primary/10">
-          <Target className="size-5 text-primary" aria-hidden="true" />
+        <div className="flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
+          <Target className="size-5" aria-hidden="true" />
         </div>
-        <h2 className="text-base font-semibold text-foreground">{labels.title}</h2>
+        <h2 className="text-base font-medium text-foreground">{labels.title}</h2>
       </div>
 
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">{labels.goalLabel}:</span>
-          <span className="text-sm font-medium text-foreground">{preferences.goal}</span>
+          <span className="text-sm font-medium text-foreground">
+            {preferences.goal || "Not set"}
+          </span>
         </div>
         {preferences.focuses.map((focus) => (
           <div key={focus} className="flex items-center gap-2">
@@ -40,7 +42,7 @@ export function PersonalizedInsight({
       <button
         type="button"
         onClick={onEdit}
-        className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-orange-600 hover:underline dark:text-orange-400"
       >
         {labels.editButton}
         <ArrowRight className="size-3.5" aria-hidden="true" />
