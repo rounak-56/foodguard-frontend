@@ -12,6 +12,7 @@ import {
   Settings2,
   LogOut,
   Sparkles,
+  Target,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { BrandMark } from "@/components/ui/BrandMark";
@@ -103,6 +104,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="border-t border-white/10 pt-4">
+          <Link
+            href="/challenges"
+            className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-sidebar-foreground transition-colors hover:bg-white/7 hover:text-white"
+          >
+            <Target className="size-[18px] text-sidebar-foreground/75" aria-hidden="true" />
+            Challenges
+          </Link>
           <Link
             href="/profile"
             className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-sidebar-foreground transition-colors hover:bg-white/7 hover:text-white"

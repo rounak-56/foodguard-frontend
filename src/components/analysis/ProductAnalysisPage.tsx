@@ -25,6 +25,7 @@ import { Disclaimer } from "./Disclaimer";
 import { AnalysisActions } from "./AnalysisActions";
 import { AnalysisLoading } from "./AnalysisLoading";
 import { AnalysisError } from "./AnalysisError";
+import { ChallengeCompleteDialog } from "@/components/challenges/ChallengeCompleteDialog";
 import { analysisCache, analysisCacheKey } from "@/lib/cache/analysis-cache";
 import { OfflineIndicator } from "@/components/offline/OfflineIndicator";
 import { apiUrl } from "@/lib/network/api-url";
@@ -35,6 +36,10 @@ import {
   submitProductScanActivity,
   type GamificationActivityResult,
 } from "@/services/gamification.service";
+import {
+  submitIngredientViewActivity,
+  type ChallengeCompletion,
+} from "@/services/challenge.service";
 
 type AnalysisPhase = "loading" | "result" | "error";
 
@@ -67,6 +72,7 @@ export function ProductAnalysisPage({
   const [product, setProduct] = useState<ProductAnalysisResult | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [reward, setReward] = useState<GamificationActivityResult | null>(null);
+  const [completedChallenge, setCompletedChallenge] = useState<ChallengeCompletion | null>(null);
   const scanEventIdRef = useRef<string | null>(null);
   const scanSignatureRef = useRef<string | null>(null);
 
@@ -94,6 +100,7 @@ export function ProductAnalysisPage({
     async function load() {
       setPhase("loading");
        setReward(null);
+       setCompletedChallenge(null);
       setProduct(null);
       const trimmedBarcode = barcode.trim();
       const trimmedIngredients = ingredients.trim();
@@ -166,6 +173,12 @@ export function ProductAnalysisPage({
                longest_streak: number;
                activity_date: string;
                idempotent: boolean;
+              completed_challenges?: Array<{
+                challenge_id: string;
+                name: string;
+                description: string;
+                xp_reward: number;
+              }>;
              } | null;
            } | null;
           error?: { message?: string } | null;
@@ -192,6 +205,9 @@ export function ProductAnalysisPage({
              activity_date: analysisReward.activity_date,
              idempotent: analysisReward.idempotent,
            });
+           if (analysisReward.completed_challenges?.[0]) {
+             setCompletedChallenge(analysisReward.completed_challenges[0]);
+           }
          }
 
          // Only a fresh, identified analysis can submit activity. Cached
@@ -201,6 +217,9 @@ export function ProductAnalysisPage({
            try {
              const activity = await submitProductScanActivity(freshProduct.id, scanEventId);
               if (!activity.idempotent) setReward(activity);
+              if (activity.completed_challenges?.[0]) {
+                setCompletedChallenge(activity.completed_challenges[0]);
+              }
            } catch {
              // The analysis response may already contain the authoritative
              // reward if the separate activity request was interrupted.
@@ -223,6 +242,18 @@ export function ProductAnalysisPage({
                  });
                }
              }
+           }
+           if (freshProduct.ingredients?.length) {
+             void submitIngredientViewActivity(
+               freshProduct.id,
+               `${scanEventId}:ingredients`,
+             ).then((viewActivity) => {
+               if (!viewActivity.idempotent && viewActivity.completed_challenges[0]) {
+                 setCompletedChallenge(viewActivity.completed_challenges[0]);
+               }
+             }).catch(() => {
+               // Ingredient challenges are best-effort and never block analysis.
+             });
            }
          } else if (providedScanEventId && json.meta?.gamification) {
            publishGamificationUpdate({
@@ -493,7 +524,11 @@ export function ProductAnalysisPage({
         </div>
       </main>
 
-      {reward && !reward.idempotent && (
+      {completedChallenge && (
+        <ChallengeCompleteDialog challenge={completedChallenge} onClose={() => setCompletedChallenge(null)} />
+      )}
+
+      {reward && !reward.idempotent && !completedChallenge && (
         <div
           className="fixed inset-0 z-[60] flex items-center justify-center bg-sidebar/45 p-4 backdrop-blur-sm"
           role="dialog"

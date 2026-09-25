@@ -23,6 +23,12 @@ export type GamificationActivityResult = {
   longest_streak: number;
   activity_date: string;
   idempotent: boolean;
+  completed_challenges?: Array<{
+    challenge_id: string;
+    name: string;
+    description: string;
+    xp_reward: number;
+  }>;
 };
 
 function getToken(): string | null {
@@ -110,5 +116,8 @@ export async function submitProductScanActivity(
     longest_streak: result.longest_streak,
     last_activity_date: result.activity_date,
   });
+  if (typeof window !== "undefined" && (result.completed_challenges?.length ?? 0) > 0) {
+    window.dispatchEvent(new Event("foodguard:challenges-updated"));
+  }
   return result;
 }

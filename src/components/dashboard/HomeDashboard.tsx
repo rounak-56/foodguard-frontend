@@ -16,6 +16,7 @@ import { HowItWorks } from "@/components/dashboard/HowItWorks";
 import { TrustFooter } from "@/components/dashboard/TrustFooter";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { GamificationCard } from "@/components/dashboard/GamificationCard";
+import { DailyChallengePreview } from "@/components/challenges/DailyChallengePreview";
 import {
   TopNavigation,
   BottomNavigation,
@@ -186,6 +187,7 @@ export function HomeDashboard() {
               />
               <GamificationCard />
             </div>
+            <DailyChallengePreview />
             <QuickActions />
 
             <section>
